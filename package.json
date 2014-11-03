@@ -1,0 +1,42 @@
+{
+  "name": "qsql-bench",
+  "version": "0.2.0",
+
+  "description": "A tool that measures performance of SQL query builders for node.js.",
+  "keywords": [ "qsql", "knex", "squel", "benchmark", "performance"],
+
+  "homepage": "https://github.com/jshq/qsql-bench",
+  "bugs": {
+    "url": "https://github.com/jshq/qsql-bench/issues"
+  },
+
+  "contributors": [{
+    "name": "Petr Kobalicek",
+    "email": "kobalicek.petr@gmail.com",
+    "url": "http://kobalicek.com"
+  }],
+
+  "license": "Unlicense",
+
+  "main": "qsql-bench.js",
+
+  "dependencies": {
+    "knex": "*",
+    "squel": "*",
+    "qsql": "*",
+    "sqlite3": "*"
+  },
+
+  "devDependencies": {
+    "mocha": "*"
+  },
+
+  "repository" : {
+    "type": "git",
+    "url": "https://github.com/jshq/qsql-bench.git"
+  },
+
+  "scripts": {
+    "bench": "node qsql-bench.js"
+  }
+}
