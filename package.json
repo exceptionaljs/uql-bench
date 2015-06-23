@@ -1,13 +1,13 @@
 {
-  "name": "qsql-bench",
-  "version": "0.2.0",
+  "name": "uql-bench",
+  "version": "1.0.0",
 
   "description": "A tool that measures performance of SQL query builders for node.js.",
-  "keywords": [ "qsql", "knex", "squel", "benchmark", "performance"],
+  "keywords": [ "uql", "knex", "squel", "benchmark", "performance", "sql"],
 
-  "homepage": "https://github.com/jshq/qsql-bench",
+  "homepage": "https://github.com/exceptionaljs/uql-bench",
   "bugs": {
-    "url": "https://github.com/jshq/qsql-bench/issues"
+    "url": "https://github.com/exceptionaljs/uql-bench/issues"
   },
 
   "contributors": [{
@@ -18,13 +18,13 @@
 
   "license": "Unlicense",
 
-  "main": "qsql-bench.js",
+  "main": "uql-bench.js",
 
   "dependencies": {
     "knex": "*",
+    "sqlite3": "*",
     "squel": "*",
-    "qsql": "*",
-    "sqlite3": "*"
+    "uql": "*"
   },
 
   "devDependencies": {
@@ -33,10 +33,10 @@
 
   "repository" : {
     "type": "git",
-    "url": "https://github.com/jshq/qsql-bench.git"
+    "url": "https://github.com/exceptionaljs/uql-bench.git"
   },
 
   "scripts": {
-    "bench": "node qsql-bench.js"
+    "bench": "node uql-bench.js"
   }
 }
