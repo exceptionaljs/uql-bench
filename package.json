@@ -1,13 +1,13 @@
 {
-  "name": "uql-bench",
+  "name": "xql-bench",
   "version": "1.0.0",
 
   "description": "A tool that measures performance of SQL query builders for node.js.",
-  "keywords": [ "uql", "knex", "squel", "benchmark", "performance", "sql"],
+  "keywords": [ "xql", "knex", "squel", "benchmark", "performance", "sql"],
 
-  "homepage": "https://github.com/exceptionaljs/uql-bench",
+  "homepage": "https://github.com/exceptionaljs/xql-bench",
   "bugs": {
-    "url": "https://github.com/exceptionaljs/uql-bench/issues"
+    "url": "https://github.com/exceptionaljs/xql-bench/issues"
   },
 
   "contributors": [{
@@ -18,13 +18,13 @@
 
   "license": "Unlicense",
 
-  "main": "uql-bench.js",
+  "main": "xql-bench.js",
 
   "dependencies": {
     "knex": "*",
     "sqlite3": "*",
     "squel": "*",
-    "uql": "*"
+    "xql": "*"
   },
 
   "devDependencies": {
@@ -33,10 +33,10 @@
 
   "repository" : {
     "type": "git",
-    "url": "https://github.com/exceptionaljs/uql-bench.git"
+    "url": "https://github.com/exceptionaljs/xql-bench.git"
   },
 
   "scripts": {
-    "bench": "node uql-bench.js"
+    "bench": "node xql-bench.js"
   }
 }

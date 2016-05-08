@@ -1,13 +1,13 @@
 "use strict";
 
-var uql = require("uql");
+var xql = require("xql");
 var squel = require("squel");
 
 var knex = require("knex")({
   // We have to use some DB, this seems easiest.
   client: "sqlite3",
   connection: {
-    filename: "./uql-bench-tmp.sqlite"
+    filename: "./xql-bench-tmp.sqlite"
   }
 });
 
@@ -24,27 +24,29 @@ var IgnoredKeys = {
 };
 
 // ============================================================================
-// [uql.js]
+// [xql.js]
 // ============================================================================
 
-var UqlBench = (function() {
-  var SELECT = uql.SELECT;
-  var UPDATE = uql.UPDATE;
-  var INSERT = uql.INSERT;
-  var DELETE = uql.DELETE;
+var xqlpg = xql.createContext({ dialect: "pgsql" });
 
-  var COL = uql.COL;
-  var OP = uql.OP;
+var xqlBench = (function() {
+  var SELECT = xql.SELECT;
+  var UPDATE = xql.UPDATE;
+  var INSERT = xql.INSERT;
+  var DELETE = xql.DELETE;
+
+  var COL = xql.COL;
+  var OP = xql.OP;
 
   return {
     moduleInfo: function() {
-      return "uql.js " + uql.misc.VERSION;
+      return "xql.js " + xql.misc.VERSION;
     },
 
     SELECT_0: function() {
       return SELECT(["a", "b", "c"])
         .FROM("x")
-        .compileQuery();
+        .compileQuery(xqlpg);
     },
 
     SELECT_1: function() {
@@ -53,7 +55,7 @@ var UqlBench = (function() {
         .WHERE("enabled", "=", true)
         .OFFSET(100)
         .LIMIT(50)
-        .compileQuery();
+        .compileQuery(xqlpg);
     },
 
     SELECT_2: function() {
@@ -62,20 +64,20 @@ var UqlBench = (function() {
         .WHERE("enabled", "=", false)
         .WHERE("pending", "=", false)
         .WHERE("blocked", "=", false)
-        .compileQuery();
+        .compileQuery(xqlpg);
     },
 
     SELECT_3: function() {
       return SELECT(["x.a", "x.b", "y.c"])
         .FROM("x")
         .INNER_JOIN("y", OP(COL("x.uid"), "=", COL("y.uid")))
-        .compileQuery();
+        .compileQuery(xqlpg);
     },
 
     INSERT_0: function() {
       return INSERT("x")
         .VALUES({ a: 0, b: false, c: "'someText\"" })
-        .compileQuery();
+        .compileQuery(xqlpg);
     },
 
     UPDATE_0: function() {
@@ -86,13 +88,13 @@ var UqlBench = (function() {
           c: "'\"?someStringToBeEscaped'"
         })
         .WHERE("uid", "=", 1)
-        .compileQuery();
+        .compileQuery(xqlpg);
     },
 
     DELETE_0: function() {
       return DELETE("x")
         .WHERE("uid", ">=", 1)
-        .compileQuery();
+        .compileQuery(xqlpg);
     }
   };
 })();
@@ -158,7 +160,7 @@ var KnexBench = (function() {
     DELETE_0: function() {
       return knex("x")
         .del()
-        .where("uid", ">=", 10)
+        .where("uid", ">=", 1)
         .toString();
     }
   };
@@ -269,7 +271,7 @@ var Utils = {
 // ============================================================================
 
 function main() {
-  var modules = [UqlBench, KnexBench, SquelBench];
+  var modules = [xqlBench, KnexBench, SquelBench];
 
   modules.forEach(function(module) {
     console.log(module.moduleInfo());
