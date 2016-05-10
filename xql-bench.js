@@ -27,7 +27,7 @@ var IgnoredKeys = {
 // [xql.js]
 // ============================================================================
 
-var xqlpg = xql.createContext({ dialect: "pgsql" });
+var xqlpg = xql.dialect.newContext({ dialect: "pgsql" });
 
 var xqlBench = (function() {
   var SELECT = xql.SELECT;
