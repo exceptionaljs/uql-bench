@@ -1,41 +1,38 @@
 {
   "name": "xql-bench",
   "version": "1.0.0",
-
-  "description": "A tool that measures performance of SQL query builders for node.js.",
-  "keywords": [ "xql", "knex", "squel", "benchmark", "performance", "sql"],
-
-  "homepage": "https://github.com/exceptionaljs/xql-bench",
-  "bugs": {
-    "url": "https://github.com/exceptionaljs/xql-bench/issues"
-  },
-
-  "contributors": [{
-    "name": "Petr Kobalicek",
-    "email": "kobalicek.petr@gmail.com",
-    "url": "http://kobalicek.com"
-  }],
-
   "license": "Unlicense",
-
+  "description": "A tool that measures performance of SQL query builders for node.js.",
+  "keywords": [
+    "xql",
+    "knex",
+    "squel",
+    "benchmark",
+    "performance",
+    "sql"
+  ],
+  "homepage": "https://github.com/jsstuff/xql-bench",
+  "bugs": {
+    "url": "https://github.com/jsstuff/xql-bench/issues"
+  },
+  "contributors": [
+    "Petr Kobalicek <kobalicek.petr@gmail.com> (kobalicek.com)"
+  ],
   "main": "xql-bench.js",
-
   "dependencies": {
-    "knex": "*",
+    "sql-bricks": "*",
     "sqlite3": "*",
+    "knex": "*",
     "squel": "*",
     "xql": "*"
   },
-
   "devDependencies": {
     "mocha": "*"
   },
-
-  "repository" : {
+  "repository": {
     "type": "git",
-    "url": "https://github.com/exceptionaljs/xql-bench.git"
+    "url": "https://github.com/jsstuff/xql-bench.git"
   },
-
   "scripts": {
     "bench": "node xql-bench.js"
   }

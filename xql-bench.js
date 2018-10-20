@@ -1,42 +1,238 @@
 "use strict";
 
-var xql = require("xql");
-var squel = require("squel");
-
-var knex = require("knex")({
+const knex = require("knex")({
   // We have to use some DB, this seems easiest.
   client: "sqlite3",
   connection: {
-    filename: "./xql-bench-tmp.sqlite"
+    filename: ":memory:"
   }
 });
+
+const sqlbricks = require("sql-bricks");
+const squel = require("squel");
+const xql = require("xql");
 
 // ============================================================================
 // [Options]
 // ============================================================================
 
-var Options = {
+const Options = {
   quantity: 100000 // Number of calls.
 };
 
-var IgnoredKeys = {
+const IgnoredKeys = {
   moduleInfo: true
 };
+
+// ============================================================================
+// [Knex]
+// ============================================================================
+
+const KnexBench = (function() {
+  return {
+    moduleInfo: function() {
+      return "Knex " + require("knex/package").version;
+    },
+
+    SELECT_0: function() {
+      return knex("x")
+       .select(["a", "b", "c"])
+       .toString();
+    },
+
+    SELECT_1: function() {
+      return knex("x")
+       .select(["a", "b", "c"])
+       .where("enabled", "=", true)
+       .offset(100)
+       .limit(50)
+       .toString();
+    },
+
+    SELECT_2: function() {
+      return knex("x")
+       .select(["a", "b", "c"])
+       .where("enabled", "=", false)
+       .where("pending", "=", false)
+       .where("blocked", "=", false)
+       .toString();
+    },
+
+    SELECT_3: function() {
+      return knex("x")
+       .select(["x.a", "x.b", "y.c"])
+       .innerJoin("y", "x.uid", "y.uid")
+       .toString();
+    },
+
+    INSERT_0: function() {
+      return knex("x")
+        .insert({ a: 0, b: false, c: "'someText\"" })
+        .toString();
+    },
+
+    UPDATE_0: function() {
+      return knex("x")
+        .update({
+          a: 1,
+          b: 2,
+          c: "'\"?someStringToBeEscaped'"
+        })
+        .where("uid", "=", 1)
+        .toString();
+    },
+
+    DELETE_0: function() {
+      return knex("x")
+        .del()
+        .where("uid", ">=", 1)
+        .toString();
+    }
+  };
+})();
+
+// ============================================================================
+// [SqlBricksBench]
+// ============================================================================
+
+const SqlBricksBench = (function() {
+  return {
+    moduleInfo: function() {
+      return "SqlBricks " + require("sql-bricks/package").version;
+    },
+
+    SELECT_0: function() {
+      return sqlbricks.select("a", "b", "c")
+        .from("x")
+        .toString();
+    },
+
+    SELECT_1: function() {
+      // Unfair, SqlBricks doesn't provide LIMIT/OFFSET without extensions.
+      return sqlbricks.select("a", "b", "c")
+        .from("x")
+        .where({ enabled: true })
+        .toString();
+    },
+
+    SELECT_2: function() {
+      return sqlbricks.select("a", "b", "c")
+        .from("x")
+        .where("enabled", false)
+        .where("pending", false)
+        .where("blocked", false)
+        .toString();
+    },
+
+    SELECT_3: function() {
+      return sqlbricks.select("x.a", "x.b", "x.c")
+        .from("x")
+        .leftJoin("y", { "x.uid": "y.uid" })
+        .toString();
+    },
+
+    INSERT_0: function() {
+      return sqlbricks.insert("x", { a: 0, b: false, c: "'someText\"" })
+        .toString();
+    },
+
+    UPDATE_0: function() {
+      return sqlbricks.update("x", { a: 1, b: 2, c: "'\"?someStringToBeEscaped'" })
+        .where("uid", 1).toString();
+    },
+
+    DELETE_0: function() {
+      return sqlbricks.delete("x")
+        .where("uid", 1).toString();
+    }
+  };
+})();
+
+// ============================================================================
+// [Squel]
+// ============================================================================
+
+const SquelBench = (function() {
+  return {
+    moduleInfo: function() {
+      return "Squel " + require("squel/package").version;
+    },
+
+    SELECT_0: function() {
+      return squel.select()
+        .from("x")
+        .field("a").field("b").field("c")
+        .toString();
+    },
+
+    SELECT_1: function() {
+      return squel.select()
+        .from("x")
+        .field("a").field("b").field("c")
+        .where("enabled = TRUE")
+        .offset(100)
+        .limit(50)
+        .toString();
+    },
+
+    SELECT_2: function() {
+      return squel.select()
+        .from("x")
+        .field("a").field("b").field("c")
+        .where("enabled = FALSE")
+        .where("pending = FALSE")
+        .where("blocked = FALSE")
+        .toString();
+    },
+
+    SELECT_3: function() {
+      return squel.select()
+        .from("x")
+        .field("x.a").field("x.b").field("x.c")
+        .left_join("y", "x.uid = y.uid")
+        .toString();
+    },
+
+    INSERT_0: function() {
+      return squel.insert()
+        .into("x")
+        .setFields({ a: 0, b: false, c: "'someText\"" })
+        .toString();
+    },
+
+    UPDATE_0: function() {
+      return squel.update()
+        .table("x")
+        .set("a", 1)
+        .set("b", 2)
+        .set("c", "'\"?someStringToBeEscaped'")
+        .where("uid = 1")
+        .toString();
+    },
+
+    DELETE_0: function() {
+      return squel.delete()
+        .from("x")
+        .where("uid >= 1")
+        .toString();
+    }
+  };
+})();
 
 // ============================================================================
 // [xql.js]
 // ============================================================================
 
-var xqlpg = xql.dialect.newContext({ dialect: "pgsql" });
+const XqlBench = (function() {
+  const xqlpg = xql.dialect.newContext({ dialect: "pgsql" });
 
-var xqlBench = (function() {
-  var SELECT = xql.SELECT;
-  var UPDATE = xql.UPDATE;
-  var INSERT = xql.INSERT;
-  var DELETE = xql.DELETE;
+  const SELECT = xql.SELECT;
+  const UPDATE = xql.UPDATE;
+  const INSERT = xql.INSERT;
+  const DELETE = xql.DELETE;
 
-  var COL = xql.COL;
-  var OP = xql.OP;
+  const COL = xql.COL;
+  const OP = xql.OP;
 
   return {
     moduleInfo: function() {
@@ -100,148 +296,10 @@ var xqlBench = (function() {
 })();
 
 // ============================================================================
-// [Knex]
-// ============================================================================
-
-var KnexBench = (function() {
-  return {
-    moduleInfo: function() {
-      return "Knex " + knex.VERSION;
-    },
-
-    SELECT_0: function() {
-      return knex("x")
-       .select(["a", "b", "c"])
-       .toString();
-    },
-
-    SELECT_1: function() {
-      return knex("x")
-       .select(["a", "b", "c"])
-       .where("enabled", "=", true)
-       .offset(100)
-       .limit(50)
-       .toString();
-    },
-
-    SELECT_2: function() {
-      return knex("x")
-       .select(["a", "b", "c"])
-       .where("enabled", "=", false)
-       .where("pending", "=", false)
-       .where("blocked", "=", false)
-       .toString();
-    },
-
-    SELECT_3: function() {
-      return knex("x")
-       .select(["x.a", "x.b", "y.c"])
-       .innerJoin("y", "x.uid", "y.uid")
-       .toString();
-    },
-
-    INSERT_0: function() {
-      return knex("x")
-        .insert({ a: 0, b: false, c: "'someText\"" })
-        .toString();
-    },
-
-    UPDATE_0: function() {
-      return knex("x")
-        .update({
-          a: 1,
-          b: 2,
-          c: "'\"?someStringToBeEscaped'"
-        })
-        .where("uid", "=", 1)
-        .toString();
-    },
-
-    DELETE_0: function() {
-      return knex("x")
-        .del()
-        .where("uid", ">=", 1)
-        .toString();
-    }
-  };
-})();
-
-// ============================================================================
-// [Squel]
-// ============================================================================
-
-var SquelBench = (function() {
-  return {
-    moduleInfo: function() {
-      return "Squel " + squel.VERSION;
-    },
-
-    SELECT_0: function() {
-      return squel.select()
-        .from("x")
-        .field("a").field("b").field("c")
-        .toString();
-    },
-
-    SELECT_1: function() {
-      return squel.select()
-        .from("x")
-        .field("a").field("b").field("c")
-        .where("enabled = TRUE")
-        .offset(100)
-        .limit(50)
-        .toString();
-    },
-
-    SELECT_2: function() {
-      return squel.select()
-        .from("x")
-        .field("a").field("b").field("c")
-        .where("enabled = FALSE")
-        .where("pending = FALSE")
-        .where("blocked = FALSE")
-        .toString();
-    },
-
-    SELECT_3: function() {
-      return squel.select()
-        .from("x")
-        .field("x.uid").field("x.name").field("r.granted")
-        .left_join("y", "x.uid = y.uid")
-        .toString();
-    },
-
-    INSERT_0: function() {
-      return squel.insert()
-        .into("x")
-        .setFields({ a: 0, b: false, c: "'someText\"" })
-        .toString();
-    },
-
-    UPDATE_0: function() {
-      return squel.update()
-        .table("x")
-        .set("a", 1)
-        .set("b", 2)
-        .set("c", "'\"?someStringToBeEscaped'")
-        .where("uid = 1")
-        .toString();
-    },
-
-    DELETE_0: function() {
-      return squel.delete()
-        .from("x")
-        .where("uid >= 1")
-        .toString();
-    }
-  };
-})();
-
-// ============================================================================
 // [Utils]
 // ============================================================================
 
-var Utils = {
+const Utils = {
   padLeft: function(s, n) {
     while (s.length < n)
       s = " " + s;
@@ -271,7 +329,12 @@ var Utils = {
 // ============================================================================
 
 function main() {
-  var modules = [xqlBench, KnexBench, SquelBench];
+  var modules = [
+    KnexBench,
+    SqlBricksBench,
+    SquelBench,
+    XqlBench
+  ];
 
   modules.forEach(function(module) {
     console.log(module.moduleInfo());
