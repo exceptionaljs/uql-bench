@@ -66,5 +66,5 @@ DELETE_0: 0.110 [s]: DELETE FROM "x" WHERE "uid" >= 1;
 Conclusion
 ----------
 
-The winner is clearly xql.js as it's many times faster than all other competing libraries. It seems that the xml.js is simply well-written from the performance standpoint. It also provides a lot of features and SQL constructs that other libraries don't offer or only offer through raw-query functionality (adding raw content to the query). The benchmarks were written in a way to not favor any library - they are simple by nature, but it's possible to add more complex queries in the future (and more engines).
+The winner is clearly xql.js as it's many times faster than all other competing libraries. It seems that the xql.js is simply well-written from the performance standpoint. It also provides a lot of features and SQL constructs that other libraries don't offer or only offer through raw-query functionality (adding raw content to the query). The benchmarks were written in a way to not favor any library - they are simple by nature, but it's possible to add more complex queries in the future (and more engines).
 
